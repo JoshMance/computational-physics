@@ -11,7 +11,7 @@ A = 1                           # The distance between atoms (unit value)
 E = 1.60217663*(10**-19)        # The charge of a proton
 E_0 = 8.8541878128*(10**-12)    # The permittivity of free space
 PI = 3.14159265359              
-L = 250                         # The cubic lattice has sides of length 
+L = 100                         # The cubic lattice has sides of length 
                                 # 2*L+1 atoms and contains (2*L+1)**3 atoms
 
 # Calculates the effect the charge a single atom located at (i,j,k)
@@ -26,26 +26,16 @@ def potential(i, j, k):
 
     return potential
 
-# Uses permutations with replacement to return the coordinates of 
-# all atoms within the bounds of a lattice defined by L, excluding (0,0,0)
-def atom_coordinates_list():
-
-    integers = [val-L for val in list(range((2*L)+1))]
-    coordinates = list(itertools.product(integers, repeat=3))
-    coordinates.remove((0,0,0))
-
-    return coordinates
-
-
 # Creates and iterates over all coordinates constrained by L to find
 # the total potential experienced by the atom at the origin (0,0,0)
 def find_total_potential():
     
     total_potential = 0
-    coordinates = atom_coordinates_list()
-    
-    for i, j, k in tqdm(coordinates):
-        total_potential += potential(i, j, k)
+
+    integers = [val-L for val in list(range((2*L)+1))]
+    for i, j, k in tqdm(itertools.product(integers, repeat=3)):
+        if (i, j, k) != (0,0,0):
+            total_potential += potential(i, j, k)
 
     return total_potential
 
