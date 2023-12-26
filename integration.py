@@ -1,37 +1,49 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from math import sin, cos, pi
+from math import sin, cos, tan, pi
 
 def f(x):
-    return sin(x**4 - 2*x + 1)+cos(x**3)
+    return 5*sin(x)
 
-def integrate(x_min, x_max, num_points):
+def trapezium_integration(a, b, num_points):
 
-    dx = (x_max-x_min)/num_points
-
-    x_vals = [x_min+k*dx for k in range(num_points+1)]
-    y_vals = [f(x) for x in x_vals]
-
-    area = 0.5*f(x_min) + 0.5*f(x_max) + sum(y_vals[1:])
+    dx = (b-a)/num_points
+    area = 0.5*f(a) + 0.5*f(b)
+    area += sum([f(a+k*dx) for k in range(1, num_points)])
     area *= dx
 
-    return area, x_vals, y_vals
+    return area
 
-x_min = 0.0
-x_max = 1.0
-num_points_integrate = 10
-num_points_plot = 10_000
+def simpsons_integration(a, b, num_points):
+
+    dx = (b-a)/num_points
+    area = f(a) + f(b)
+    area += 4*sum([f(a+k*dx) for k in range(1, num_points, 2)])
+    area += 2*sum([f(a+k*dx) for k in range(2, num_points, 2)])
+    area *= (1/3)*dx
+
+    return area
+
+
+
+x_min, x_max = 0.0, pi
+n_min, n_max = 10, 300
+dn = 10
+n_values = list(range(n_min, n_max+1, dn))
 
 plt.figure(figsize=(15, 5))
 
-x_plot = np.linspace(x_min, x_max, num_points_plot)
-y_plot = [f(x) for x in x_plot]
-plt.plot(x_plot, y_plot, c = 'blue')  
+trapezium_results = [trapezium_integration(x_min, x_max, n) for n in n_values]
+simpsons_results = [simpsons_integration(x_min, x_max, n) for n in n_values]
 
-area, x_vals, y_vals = integrate(x_min, x_max, num_points_integrate)
-plt.plot(x_vals, y_vals, c = 'orange')
-plt.scatter(x_vals, y_vals, c = 'orange')
+trapezium_error = [(10 - val)/10 for val in trapezium_results]
+simpsons_error = [(10 - val)/10 for val in simpsons_results]
+
+plt.plot(n_values, trapezium_error)
+plt.plot(n_values, simpsons_error)
+
 plt.show()
 
-print(area)
+print(trapezium_results[-1])
+print(simpsons_results[-1])
 
